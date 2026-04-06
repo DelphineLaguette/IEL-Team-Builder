@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IBL Energy — Team Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0B2145;
+    --navy-mid: #1F4E79;
+    --pink: #FF51A1;
+    --teal: #00D0DA;
+    --cream: #FAF8F4;
+    --white: #FFFFFF;
+    --gray-100: #F4F2EE;
+    --gray-200: #E8E5DF;
+    --gray-400: #9E9B95;
+    --gray-600: #5C5A56;
+    --green: #1A7F5A;
+    --green-bg: #E6F5EF;
+    --amber: #B06A00;
+    --amber-bg: #FEF3DC;
+    --red: #B03030;
+    --red-bg: #FCEAEA;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--navy);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--navy);
+    padding: 0 3rem;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .logo-mark {
+    width: 36px;
+    height: 36px;
+    background: var(--pink);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo-mark svg { width: 20px; height: 20px; }
+
+  .logo-text {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: var(--white);
+    letter-spacing: 0.01em;
+  }
+
+  .logo-sub {
+    font-size: 11px;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 1px;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .step-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .step-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    transition: background .3s;
+  }
+
+  .step-dot.active { background: var(--pink); }
+  .step-dot.done { background: var(--teal); }
+
+  /* ── LAYOUT ── */
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 3rem 2rem;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    margin-bottom: 3rem;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 42px;
+    line-height: 1.1;
+    color: var(--navy);
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--pink);
+  }
+
+  .hero-sub {
+    font-size: 15px;
+    color: var(--gray-600);
+    margin-top: 10px;
+    max-width: 480px;
+    line-height: 1.6;
+  }
+
+  .legend {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--gray-600);
+    font-weight: 500;
+    letter-spacing: .03em;
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  /* ── GRID ── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  .three-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+  }
+
+  /* ── CARDS ── */
+  .panel {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 1.75rem;
+    border: 1px solid var(--gray-200);
+  }
+
+  .panel-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .panel-title::before {
+    content: '';
+    display: block;
+    width: 3px;
+    height: 14px;
+    background: var(--pink);
+    border-radius: 2px;
+  }
+
+  /* ── FORM ── */
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    margin-bottom: 6px;
+  }
+
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--navy);
+    background: var(--gray-100);
+    border: 1.5px solid transparent;
+    border-radius: 10px;
+    outline: none;
+    transition: border-color .2s, background .2s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  .form-group select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239E9B95' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus {
+    border-color: var(--pink);
+    background: var(--white);
+  }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: transform .15s, opacity .15s;
+    letter-spacing: .01em;
+  }
+
+  .btn:hover { opacity: .88; transform: translateY(-1px); }
+  .btn:active { transform: translateY(0); }
+
+  .btn-primary {
+    background: var(--navy);
+    color: var(--white);
+  }
+
+  .btn-pink {
+    background: var(--pink);
+    color: var(--white);
+  }
+
+  .btn-ghost {
+    background: var(--gray-100);
+    color: var(--navy);
+  }
+
+  .btn-danger {
+    background: var(--red-bg);
+    color: var(--red);
+  }
+
+  .btn-full { width: 100%; justify-content: center; }
+
+  /* ── PERSON CARDS ── */
+  .person-card {
+    background: var(--gray-100);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    margin-bottom: .75rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: background .2s;
+    animation: fadeIn .3s ease;
+  }
+
+  .person-card:hover { background: var(--gray-200); }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+    font-family: 'DM Serif Display', serif;
+  }
+
+  .person-info { flex: 1; min-width: 0; }
+
+  .person-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--navy);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .person-role {
+    font-size: 12px;
+    color: var(--gray-400);
+    margin-top: 2px;
+  }
+
+  .badge-row {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+  }
+
+  .badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 99px;
+    letter-spacing: .02em;
+  }
+
+  .badge-belbin { background: #E1F5EE; color: #0A5C42; }
+  .badge-mbti   { background: #E8F0FB; color: #1A3A72; }
+  .badge-strength { background: #FEF3DC; color: #8A5200; }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--gray-400);
+    font-size: 13px;
+    font-style: italic;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: var(--gray-200);
+    margin: 1.5rem 0;
+  }
+
+  /* ── TAGS (add form) ── */
+  .add-panel {
+    background: var(--cream);
+    border: 1.5px dashed var(--gray-200);
+    border-radius: 14px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+  }
+
+  .add-panel .panel-title { margin-bottom: 1rem; }
+
+  /* ── CTA BAR ── */
+  .cta-bar {
+    background: var(--navy);
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .cta-bar p {
+    color: rgba(255,255,255,0.7);
+    font-size: 14px;
+  }
+
+  .cta-bar strong { color: var(--white); }
+
+  /* ── RESULTS ── */
+  #view-results { display: none; }
+
+  .results-header {
+    background: var(--navy);
+    border-radius: 20px;
+    padding: 2rem 2.5rem;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .results-header::after {
+    content: '';
+    position: absolute;
+    right: -40px;
+    top: -40px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: rgba(255,81,161,0.08);
+  }
+
+  .results-header::before {
+    content: '';
+    position: absolute;
+    right: 60px;
+    bottom: -60px;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: rgba(0,208,218,0.06);
+  }
+
+  .results-breadcrumb {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 10px;
+  }
+
+  .results-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 32px;
+    color: var(--white);
+    line-height: 1.15;
+  }
+
+  .results-title em { color: var(--pink); font-style: italic; }
+
+  .results-meta {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1.25rem;
+  }
+
+  .results-meta-item {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    font-weight: 500;
+  }
+
+  .results-meta-item strong {
+    color: var(--teal);
+    font-size: 13px;
+  }
+
+  /* ── STAT CARDS ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .stat-card {
+    background: var(--white);
+    border-radius: 14px;
+    padding: 1.25rem;
+    border: 1px solid var(--gray-200);
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    color: var(--navy);
+    line-height: 1;
+  }
+
+  .stat-num.pink { color: var(--pink); }
+  .stat-num.teal { color: #00A8B0; }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--gray-400);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-top: 6px;
+  }
+
+  /* ── TEAM LIST ── */
+  .team-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 1rem 1.25rem;
+    background: var(--gray-100);
+    border-radius: 12px;
+    margin-bottom: .625rem;
+    animation: fadeIn .4s ease both;
+  }
+
+  .team-row:nth-child(1) { animation-delay: .05s; }
+  .team-row:nth-child(2) { animation-delay: .10s; }
+  .team-row:nth-child(3) { animation-delay: .15s; }
+  .team-row:nth-child(4) { animation-delay: .20s; }
+  .team-row:nth-child(5) { animation-delay: .25s; }
+  .team-row:nth-child(6) { animation-delay: .30s; }
+
+  .team-rank {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--navy);
+    color: var(--white);
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .team-badges {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    margin-left: auto;
+  }
+
+  /* ── INSIGHTS ── */
+  .insight-item {
+    display: flex;
+    gap: 12px;
+    padding: .875rem 0;
+    border-bottom: 1px solid var(--gray-200);
+    font-size: 13.5px;
+    line-height: 1.55;
+    animation: fadeIn .5s ease both;
+  }
+
+  .insight-item:last-child { border-bottom: none; }
+
+  .insight-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+
+  .dot-green { background: var(--green); }
+  .dot-amber { background: #D08000; }
+  .dot-red   { background: var(--red); }
+
+  .insight-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 99px;
+    margin-right: 6px;
+  }
+
+  .label-strength { background: var(--green-bg); color: var(--green); }
+  .label-watch    { background: var(--amber-bg); color: var(--amber); }
+  .label-gap      { background: var(--red-bg); color: var(--red); }
+
+  /* ── MBTI ROLES GRID ── */
+  .mbti-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: .5rem;
+    margin-top: .75rem;
+  }
+
+  .mbti-item {
+    background: var(--gray-100);
+    border-radius: 8px;
+    padding: .5rem .75rem;
+    font-size: 12px;
+  }
+
+  .mbti-type { font-weight: 700; color: var(--navy-mid); }
+  .mbti-desc { color: var(--gray-600); margin-left: 4px; }
+
+  /* ── BACK BTN ── */
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-600);
+    cursor: pointer;
+    padding: 6px 0;
+    border: none;
+    background: none;
+    margin-bottom: 1.5rem;
+    transition: color .2s;
+  }
+
+  .back-btn:hover { color: var(--navy); }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 2rem;
+    font-size: 12px;
+    color: var(--gray-400);
+    border-top: 1px solid var(--gray-200);
+    margin-top: 3rem;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--gray-100); }
+  ::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10 2L13 8H17L13.5 12L15 18L10 15L5 18L6.5 12L3 8H7L10 2Z" fill="white" opacity="0.9"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-text">IBL Energy</div>
+      <div class="logo-sub">Team Builder</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="step-indicator" id="step-indicator">
+      <div class="step-dot active" id="dot-1"></div>
+      <div class="step-dot" id="dot-2"></div>
+      <div class="step-dot" id="dot-3"></div>
+    </div>
+  </div>
+</header>
+
+<!-- ══ VIEW: SETUP ══════════════════════════════════════════════ -->
+<div id="view-setup">
+<div class="container">
+
+  <div class="hero">
+    <div>
+      <h1>Build the <em>right</em> team<br>for every project.</h1>
+      <p class="hero-sub">Combine Belbin, Myers-Briggs & StrengthScope profiles to compose balanced, high-performing teams — in minutes.</p>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#0A5C42"></div> Belbin role</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#1A3A72"></div> Myers-Briggs</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#8A5200"></div> StrengthScope</div>
+    </div>
+  </div>
+
+  <div class="two-col" style="align-items:start;margin-bottom:1.5rem">
+
+    <!-- LEFT: Project -->
+    <div>
+      <div class="panel">
+        <div class="panel-title">Project definition</div>
+        <div class="form-group">
+          <label>Project name</label>
+          <input type="text" id="proj-name" placeholder="e.g. Digital transformation Q3 2026">
+        </div>
+        <div class="two-col">
+          <div class="form-group">
+            <label>Team size needed</label>
+            <select id="team-size">
+              <option value="2">2 people</option>
+              <option value="3">3 people</option>
+              <option value="4" selected>4 people</option>
+              <option value="5">5 people</option>
+              <option value="6">6 people</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Project type</label>
+            <select id="proj-type">
+              <option value="innovation">Innovation & new ideas</option>
+              <option value="execution">Execution & delivery</option>
+              <option value="change">Change management</option>
+              <option value="client">Client / stakeholder</option>
+              <option value="strategy">Strategy & planning</option>
+              <option value="culture">Culture & people</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADD PERSON -->
+      <div class="add-panel" style="margin-top:1.25rem">
+        <div class="panel-title">Add a team member</div>
+        <div class="two-col">
+          <div class="form-group">
+            <label>Full name</label>
+            <input type="text" id="new-name" placeholder="Firstname Lastname">
+          </div>
+          <div class="form-group">
+            <label>Role / Department</label>
+            <input type="text" id="new-role" placeholder="e.g. Finance Manager">
+          </div>
+        </div>
+        <div class="three-col">
+          <div class="form-group">
+            <label>Belbin role (primary)</label>
+            <select id="new-belbin">
+              <option value="">— select —</option>
+              <option>Plant</option>
+              <option>Resource Investigator</option>
+              <option>Co-ordinator</option>
+              <option>Shaper</option>
+              <option>Monitor Evaluator</option>
+              <option>Teamworker</option>
+              <option>Implementer</option>
+              <option>Completer Finisher</option>
+              <option>Specialist</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Myers-Briggs type</label>
+            <select id="new-mbti">
+              <option value="">— select —</option>
+              <option>INTJ</option><option>INTP</option><option>ENTJ</option><option>ENTP</option>
+              <option>INFJ</option><option>INFP</option><option>ENFJ</option><option>ENFP</option>
+              <option>ISTJ</option><option>ISFJ</option><option>ESTJ</option><option>ESFJ</option>
+              <option>ISTP</option><option>ISFP</option><option>ESTP</option><option>ESFP</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Top StrengthScope</label>
+            <select id="new-strength">
+              <option value="">— select —</option>
+              <option>Achievement</option><option>Catalyst</option><option>Collaboration</option>
+              <option>Common Sense</option><option>Compassion</option><option>Courage</option>
+              <option>Creativity</option><option>Detail</option><option>Developing Others</option>
+              <option>Efficiency</option><option>Emotional Control</option><option>Empathy</option>
+              <option>Enthusiasm</option><option>Flexibility</option><option>Focus</option>
+              <option>Humility</option><option>Inclusion</option><option>Initiative</option>
+              <option>Judgment</option><option>Leading</option><option>Optimism</option>
+              <option>Persuasion</option><option>Relationship Building</option>
+              <option>Resilience</option><option>Self-Confidence</option>
+              <option>Self-Improvement</option><option>Strategic Mindedness</option>
+              <option>Work Ethic</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="addPerson()">+ Add to database</button>
+      </div>
+    </div>
+
+    <!-- RIGHT: People list -->
+    <div class="panel" style="min-height:300px">
+      <div class="panel-title" style="justify-content:space-between">
+        <span>People database</span>
+        <span id="people-count" style="font-size:11px;color:var(--gray-400);font-weight:400;background:var(--gray-100);padding:2px 10px;border-radius:99px">0 people</span>
+      </div>
+      <div id="people-list">
+        <div class="empty-state">No team members yet.<br>Add your first person on the left.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-bar">
+    <div>
+      <strong>Ready to build your team?</strong>
+      <p>The algorithm will score each person against your project type and compose the most balanced team.</p>
+    </div>
+    <button class="btn btn-pink" style="padding:13px 28px;font-size:14px;white-space:nowrap" onclick="buildTeam()">
+      Build optimal team &rarr;
+    </button>
+  </div>
+
+</div>
+</div>
+
+<!-- ══ VIEW: RESULTS ══════════════════════════════════════════════ -->
+<div id="view-results">
+<div class="container">
+
+  <button class="back-btn" onclick="showSetup()">
+    ← Back to team builder
+  </button>
+
+  <div class="results-header">
+    <div class="results-breadcrumb">Team composition result</div>
+    <div class="results-title" id="res-title">—</div>
+    <div class="results-meta" id="res-meta"></div>
+  </div>
+
+  <div class="stat-grid" id="stat-grid"></div>
+
+  <div class="two-col" style="align-items:start;margin-bottom:1.5rem">
+
+    <div class="panel">
+      <div class="panel-title">Recommended team</div>
+      <div id="team-output"></div>
+    </div>
+
+    <div>
+      <div class="panel" style="margin-bottom:1.25rem">
+        <div class="panel-title">Myers-Briggs profiles in team</div>
+        <div class="mbti-grid" id="mbti-grid"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Belbin category balance</div>
+        <div id="belbin-balance"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">Analysis, gaps & watch points</div>
+    <div id="analysis-output"></div>
+  </div>
+
+</div>
+</div>
+
+<footer>
+  IBL Energy Ltd &nbsp;·&nbsp; Team Builder &nbsp;·&nbsp; Powered by Belbin · Myers-Briggs · StrengthScope
+</footer>
+
+<script>
+const BELBIN_CAT = {
+  'Plant':'Thinking','Resource Investigator':'Social','Co-ordinator':'Social',
+  'Shaper':'Action','Monitor Evaluator':'Thinking','Teamworker':'Social',
+  'Implementer':'Action','Completer Finisher':'Action','Specialist':'Thinking'
+};
+
+const MBTI_DESC = {
+  'INTJ':'Strategic visionary','INTP':'Analytical thinker','ENTJ':'Decisive leader',
+  'ENTP':'Innovative challenger','INFJ':'Insightful idealist','INFP':'Values-driven creator',
+  'ENFJ':'Inspiring motivator','ENFP':'Enthusiastic connector','ISTJ':'Reliable executor',
+  'ISFJ':'Caring supporter','ESTJ':'Organised manager','ESFJ':'Harmonious collaborator',
+  'ISTP':'Practical problem-solver','ISFP':'Flexible helper','ESTP':'Action-oriented realist',
+  'ESFP':'Energetic team player'
+};
+
+const PROJECT_NEEDS = {
+  innovation: ['Plant','Resource Investigator','Shaper','ENTP','ENFP','INFP','Creativity','Enthusiasm','Initiative','Courage'],
+  execution:  ['Implementer','Completer Finisher','Monitor Evaluator','ISTJ','ESTJ','ISTP','Efficiency','Detail','Achievement','Work Ethic'],
+  change:     ['Shaper','Co-ordinator','Teamworker','ENFJ','ENTJ','ENTP','Catalyst','Courage','Resilience','Flexibility'],
+  client:     ['Resource Investigator','Co-ordinator','Teamworker','ESFJ','ENFJ','ESTP','Relationship Building','Empathy','Persuasion','Collaboration'],
+  strategy:   ['Plant','Monitor Evaluator','Co-ordinator','INTJ','ENTJ','INTP','Strategic Mindedness','Judgment','Focus','Common Sense'],
+  culture:    ['Teamworker','Co-ordinator','Plant','ENFJ','INFJ','ENFP','Developing Others','Compassion','Inclusion','Empathy']
+};
+
+const PROJECT_LABELS = {
+  innovation:'Innovation & new ideas', execution:'Execution & delivery',
+  change:'Change management', client:'Client / stakeholder',
+  strategy:'Strategy & planning', culture:'Culture & people'
+};
+
+const AVATAR_PALETTES = [
+  {bg:'#E8F0FB',text:'#1A3A72'},{bg:'#E1F5EE',text:'#0A5C42'},
+  {bg:'#FEF3DC',text:'#8A5200'},{bg:'#F0EAFF',text:'#4A2B8A'},
+  {bg:'#FFE8F3',text:'#7A1040'},{bg:'#E8F8F9',text:'#0A5A60'},
+  {bg:'#FFF0E8',text:'#7A3010'},{bg:'#F0F5E8',text:'#3A5A10'},
+];
+
+let people = [
+  {name:'Delphine Laguette', role:'Team Engagement Lead', belbin:'Co-ordinator', mbti:'ENFJ', strength:'Developing Others'},
+  {name:'Aarti Gundooa',     role:'Head of Investment',   belbin:'Shaper',       mbti:'ENTJ', strength:'Strategic Mindedness'},
+  {name:'Pierre Egot',       role:'COO',                  belbin:'Co-ordinator', mbti:'INTJ', strength:'Leading'},
+  {name:'David Soobaya',     role:'Admin Assistant',      belbin:'Implementer',  mbti:'ISFJ', strength:'Efficiency'},
+  {name:'Teven Cunniappen',  role:'Driver & Office Attendant', belbin:'Teamworker', mbti:'ISFP', strength:'Resilience'},
+];
+
+function initials(name){ return name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase(); }
+
+function getAvatar(i){ return AVATAR_PALETTES[i % AVATAR_PALETTES.length]; }
+
+function renderPeople(){
+  const el = document.getElementById('people-list');
+  document.getElementById('people-count').textContent = people.length + ' ' + (people.length===1?'person':'people');
+  if(!people.length){
+    el.innerHTML = '<div class="empty-state">No team members yet.<br>Add your first person on the left.</div>';
+    return;
+  }
+  el.innerHTML = people.map((p,i)=>{
+    const av = getAvatar(i);
+    return `<div class="person-card">
+      <div class="avatar" style="background:${av.bg};color:${av.text}">${initials(p.name)}</div>
+      <div class="person-info">
+        <div class="person-name">${p.name}</div>
+        <div class="person-role">${p.role}</div>
+        <div class="badge-row">
+          ${p.belbin?`<span class="badge badge-belbin">${p.belbin}</span>`:''}
+          ${p.mbti?`<span class="badge badge-mbti">${p.mbti}</span>`:''}
+          ${p.strength?`<span class="badge badge-strength">${p.strength}</span>`:''}
+        </div>
+      </div>
+      <button class="btn btn-danger" style="font-size:11px;padding:5px 10px;flex-shrink:0" onclick="removePerson(${i})">Remove</button>
+    </div>`;
+  }).join('');
+}
+
+function addPerson(){
+  const name = document.getElementById('new-name').value.trim();
+  if(!name) return;
+  people.push({
+    name, role: document.getElementById('new-role').value.trim() || 'IBL Energy',
+    belbin: document.getElementById('new-belbin').value,
+    mbti:   document.getElementById('new-mbti').value,
+    strength: document.getElementById('new-strength').value,
+  });
+  ['new-name','new-role'].forEach(id=>document.getElementById(id).value='');
+  ['new-belbin','new-mbti','new-strength'].forEach(id=>document.getElementById(id).value='');
+  renderPeople();
+}
+
+function removePerson(i){ people.splice(i,1); renderPeople(); }
+
+function score(person, needs){
+  let s = 0;
+  if(needs.includes(person.belbin)) s += 3;
+  if(needs.includes(person.mbti))   s += 2;
+  if(needs.includes(person.strength)) s += 2;
+  const cat = BELBIN_CAT[person.belbin]||'';
+  if(cat==='Action') s += 0.5;
+  return s;
+}
+
+function buildTeam(){
+  const projName = document.getElementById('proj-name').value.trim() || 'New project';
+  const size     = parseInt(document.getElementById('team-size').value);
+  const type     = document.getElementById('proj-type').value;
+  const needs    = PROJECT_NEEDS[type] || [];
+
+  if(people.length < size){
+    alert(`You need at least ${size} people in the database. Currently: ${people.length}.`);
+    return;
+  }
+
+  const scored = [...people].map(p=>({...p, _score: score(p,needs)}))
+                             .sort((a,b)=>b._score-a._score);
+
+  // Compose team ensuring Belbin diversity
+  const team=[], catsSeen=new Set();
+  for(const p of scored){
+    if(team.length>=size) break;
+    const cat = BELBIN_CAT[p.belbin]||'Other';
+    if(!catsSeen.has(cat) || team.length >= scored.length-1) {
+      team.push(p); catsSeen.add(cat);
+    }
+  }
+  // Fill remaining spots if needed
+  for(const p of scored){
+    if(team.length>=size) break;
+    if(!team.find(t=>t.name===p.name)) team.push(p);
+  }
+
+  renderResults(projName, type, size, team);
+}
+
+function renderResults(projName, type, size, team){
+  document.getElementById('view-setup').style.display='none';
+  document.getElementById('view-results').style.display='block';
+  window.scrollTo(0,0);
+
+  // Update step indicator
+  document.getElementById('dot-1').className='step-dot done';
+  document.getElementById('dot-2').className='step-dot done';
+  document.getElementById('dot-3').className='step-dot active';
+
+  document.getElementById('res-title').innerHTML =
+    `<em>${projName}</em>`;
+
+  const eCount = team.filter(p=>p.mbti&&p.mbti[0]==='E').length;
+  const iCount = team.filter(p=>p.mbti&&p.mbti[0]==='I').length;
+  const cats = [...new Set(team.map(p=>BELBIN_CAT[p.belbin]).filter(Boolean))];
+
+  document.getElementById('res-meta').innerHTML = [
+    `<div class="results-meta-item"><strong>${size} people</strong> · team size</div>`,
+    `<div class="results-meta-item"><strong>${PROJECT_LABELS[type]}</strong> · project type</div>`,
+    `<div class="results-meta-item"><strong>${cats.join(' + ')}</strong> · Belbin coverage</div>`,
+  ].join('');
+
+  // Stat cards
+  const actionCount = team.filter(p=>BELBIN_CAT[p.belbin]==='Action').length;
+  const thinkCount  = team.filter(p=>BELBIN_CAT[p.belbin]==='Thinking').length;
+  const socialCount = team.filter(p=>BELBIN_CAT[p.belbin]==='Social').length;
+
+  document.getElementById('stat-grid').innerHTML = `
+    <div class="stat-card"><div class="stat-num">${team.length}</div><div class="stat-label">Team members</div></div>
+    <div class="stat-card"><div class="stat-num pink">${eCount}E · ${iCount}I</div><div class="stat-label">Energy balance</div></div>
+    <div class="stat-card"><div class="stat-num teal">${actionCount} · ${thinkCount} · ${socialCount}</div><div class="stat-label">Act · Think · Social</div></div>
+    <div class="stat-card"><div class="stat-num">${cats.length}/3</div><div class="stat-label">Belbin categories</div></div>`;
+
+  // Team list
+  document.getElementById('team-output').innerHTML = team.map((p,i)=>{
+    const av = getAvatar(people.findIndex(x=>x.name===p.name));
+    return `<div class="team-row">
+      <div class="team-rank">${i+1}</div>
+      <div class="avatar" style="width:36px;height:36px;font-size:12px;background:${av.bg};color:${av.text}">${initials(p.name)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:600;color:var(--navy)">${p.name}</div>
+        <div style="font-size:12px;color:var(--gray-400)">${p.role}</div>
+      </div>
+      <div class="team-badges">
+        ${p.belbin?`<span class="badge badge-belbin">${p.belbin}</span>`:''}
+        ${p.mbti?`<span class="badge badge-mbti">${p.mbti}</span>`:''}
+        ${p.strength?`<span class="badge badge-strength">${p.strength}</span>`:''}
+      </div>
+    </div>`;
+  }).join('');
+
+  // MBTI grid
+  document.getElementById('mbti-grid').innerHTML = team.filter(p=>p.mbti).map(p=>
+    `<div class="mbti-item">
+      <span class="mbti-type">${p.mbti}</span>
+      <span class="mbti-desc">— ${MBTI_DESC[p.mbti]||''} <span style="color:var(--gray-400);font-size:11px">(${p.name.split(' ')[0]})</span></span>
+    </div>`
+  ).join('');
+
+  // Belbin balance
+  const belbinBycat = {};
+  team.forEach(p=>{ const c=BELBIN_CAT[p.belbin]||'Other'; (belbinBycat[c]=belbinBycat[c]||[]).push(p); });
+  document.getElementById('belbin-balance').innerHTML = ['Action','Thinking','Social'].map(cat=>{
+    const members = belbinBycat[cat]||[];
+    const pct = Math.round((members.length/team.length)*100);
+    const colors = {Action:'var(--pink)',Thinking:'#1A3A72',Social:'#0A8A5A'};
+    return `<div style="margin-bottom:.75rem">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+        <span style="font-weight:600;color:var(--navy)">${cat}</span>
+        <span style="color:var(--gray-400)">${members.map(p=>p.name.split(' ')[0]).join(', ')||'—'}</span>
+      </div>
+      <div style="height:6px;background:var(--gray-200);border-radius:3px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:${colors[cat]};border-radius:3px;transition:width .8s ease"></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Analysis
+  const insights=[];
+
+  // Strengths
+  if(actionCount>0&&thinkCount>0&&socialCount>0)
+    insights.push({type:'green',label:'Strength',text:`Full Belbin coverage — Action (${belbinBycat['Action']?.map(p=>p.name.split(' ')[0]).join(', ')}), Thinking (${belbinBycat['Thinking']?.map(p=>p.name.split(' ')[0]).join(', ')}), Social (${belbinBycat['Social']?.map(p=>p.name.split(' ')[0]).join(', ')}) — this team can think, act, and connect.`});
+  if(eCount>0&&iCount>0)
+    insights.push({type:'green',label:'Strength',text:`Good introvert/extrovert balance (${eCount}E / ${iCount}I) — the team will have both external energy and deep reflection.`});
+
+  const topStrengths = team.filter(p=>p.strength).map(p=>`${p.name.split(' ')[0]} (${p.strength})`);
+  if(topStrengths.length)
+    insights.push({type:'green',label:'Strength',text:`StrengthScope highlights: ${topStrengths.join(' · ')} — complementary strengths across the team.`});
+
+  // Watch points
+  if(eCount===0) insights.push({type:'amber',label:'Watch',text:'All introverts — build in structured moments to surface ideas aloud; energy may be slow to start in group settings.'});
+  if(iCount===0) insights.push({type:'amber',label:'Watch',text:'All extroverts — create space for deep reflection before decisions; risk of acting before fully thinking through.'});
+  if(actionCount>thinkCount+1) insights.push({type:'amber',label:'Watch',text:'Action-heavy team — strong delivery drive but risk of moving too fast without enough evaluation. Consider adding a Monitor Evaluator or Plant.'});
+  if(thinkCount>actionCount+1) insights.push({type:'amber',label:'Watch',text:'Thinking-heavy team — strong analysis but risk of paralysis. Consider adding a Shaper or Implementer to drive momentum.'});
+
+  // Gaps
+  if(actionCount===0) insights.push({type:'red',label:'Gap',text:'No Action-oriented Belbin role (Shaper, Implementer, Completer Finisher) — risk of analysis paralysis and missed deadlines.'});
+  if(thinkCount===0) insights.push({type:'red',label:'Gap',text:'No Thinking-oriented Belbin role (Plant, Monitor Evaluator, Specialist) — risk of poor evaluation and unchallenged ideas.'});
+  if(socialCount===0) insights.push({type:'red',label:'Gap',text:'No Social-oriented Belbin role (Co-ordinator, Resource Investigator, Teamworker) — risk of poor team cohesion and stakeholder management.'});
+
+  const typeMap = {green:'dot-green',amber:'dot-amber',red:'dot-red'};
+  const labelMap = {green:'label-strength',amber:'label-watch',red:'label-gap'};
+  const labelText = {green:'Strength',amber:'Watch point',red:'Gap'};
+
+  document.getElementById('analysis-output').innerHTML = insights.map((ins,i)=>`
+    <div class="insight-item" style="animation-delay:${i*.07}s">
+      <div class="insight-dot ${typeMap[ins.type]}"></div>
+      <div><span class="insight-label ${labelMap[ins.type]}">${labelText[ins.type]}</span>${ins.text}</div>
+    </div>`).join('');
+}
+
+function showSetup(){
+  document.getElementById('view-setup').style.display='block';
+  document.getElementById('view-results').style.display='none';
+  document.getElementById('dot-1').className='step-dot active';
+  document.getElementById('dot-2').className='step-dot';
+  document.getElementById('dot-3').className='step-dot';
+  window.scrollTo(0,0);
+}
+
+renderPeople();
+</script>
+</body>
+</html>
