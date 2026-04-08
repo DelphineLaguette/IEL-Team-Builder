@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>IBL Energy — Team Builder</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 <style>
   :root {
     --navy: #0B2145;
@@ -806,9 +807,15 @@
 <div id="view-results">
 <div class="container">
 
-  <button class="back-btn" onclick="showSetup()">
-    ← Back to team builder
-  </button>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem">
+    <button class="back-btn" style="margin-bottom:0" onclick="showSetup()">
+      ← Back to team builder
+    </button>
+    <button class="btn btn-pink" onclick="exportToPowerPoint()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+      Export to PowerPoint
+    </button>
+  </div>
 
   <div class="results-header">
     <div class="results-breadcrumb">Team composition result</div>
@@ -887,6 +894,8 @@ const AVATAR_PALETTES = [
   {bg:'#FFE8F3',text:'#7A1040'},{bg:'#E8F8F9',text:'#0A5A60'},
   {bg:'#FFF0E8',text:'#7A3010'},{bg:'#F0F5E8',text:'#3A5A10'},
 ];
+
+let lastTeam = [], lastProjName = '', lastType = '';
 
 let people = [
   {name:'Delphine Laguette', role:'Team Engagement Lead', belbin:'Co-ordinator', mbti:'ENFJ', strength:'Developing Others'},
@@ -984,6 +993,7 @@ function buildTeam(){
 }
 
 function renderResults(projName, type, size, team){
+  lastTeam = team; lastProjName = projName; lastType = type;
   document.getElementById('view-setup').style.display='none';
   document.getElementById('view-results').style.display='block';
   window.scrollTo(0,0);
@@ -1103,6 +1113,274 @@ function showSetup(){
   document.getElementById('dot-2').className='step-dot';
   document.getElementById('dot-3').className='step-dot';
   window.scrollTo(0,0);
+}
+
+function exportToPowerPoint() {
+  if (!lastTeam || !lastTeam.length) {
+    alert('No team to export. Please build a team first.');
+    return;
+  }
+
+  const pptx = new PptxGenJS();
+  pptx.layout = 'LAYOUT_WIDE'; // 13.33 × 7.5 inches
+
+  const slide = pptx.addSlide();
+
+  // Brand colours (no # prefix for PptxGenJS)
+  const NAVY    = '0B2145', PINK    = 'FF51A1';
+  const CREAM   = 'FAF8F4', WHITE   = 'FFFFFF';
+  const GRAY100 = 'F4F2EE', GRAY200 = 'E8E5DF';
+  const GRAY400 = '9E9B95', GRAY600 = '5C5A56';
+  const GREEN   = '1A7F5A', GREENBG = 'E6F5EF';
+  const AMBER   = 'B06A00', AMBERBG = 'FEF3DC';
+  const RED     = 'B03030', REDBG   = 'FCEAEA';
+
+  slide.background = { color: CREAM };
+
+  // ── HEADER BAR ────────────────────────────────────────────
+  slide.addShape(pptx.ShapeType.rect, {
+    x: 0, y: 0, w: '100%', h: 1.3,
+    fill: { color: NAVY }, line: { type: 'none' }
+  });
+
+  // Pink logo square
+  slide.addShape(pptx.ShapeType.roundRect, {
+    x: 0.32, y: 0.22, w: 0.58, h: 0.58,
+    fill: { color: PINK }, line: { type: 'none' }, rectRadius: 0.06
+  });
+  slide.addText('★', {
+    x: 0.32, y: 0.22, w: 0.58, h: 0.58,
+    fontSize: 16, color: WHITE, align: 'center', valign: 'middle', fontFace: 'Calibri'
+  });
+
+  slide.addText('IBL Energy', {
+    x: 1.06, y: 0.21, w: 3.5, h: 0.3,
+    fontSize: 15, bold: true, color: WHITE, fontFace: 'Calibri'
+  });
+  slide.addText('TEAM BUILDER', {
+    x: 1.06, y: 0.53, w: 3.5, h: 0.2,
+    fontSize: 7.5, color: '7A99BB', charSpacing: 2.5, fontFace: 'Calibri'
+  });
+
+  // Project name – large italic, right-aligned
+  slide.addText(lastProjName || 'Team Composition', {
+    x: 4.8, y: 0.13, w: 8.2, h: 0.65,
+    fontSize: 26, bold: true, italic: true,
+    color: WHITE, align: 'right', fontFace: 'Calibri'
+  });
+  slide.addText((PROJECT_LABELS[lastType] || '').toUpperCase(), {
+    x: 4.8, y: 0.82, w: 8.2, h: 0.22,
+    fontSize: 8.5, color: '6A8FAF', align: 'right', charSpacing: 1.5, fontFace: 'Calibri'
+  });
+
+  // ── STAT STRIP ────────────────────────────────────────────
+  const eCount = lastTeam.filter(p => p.mbti && p.mbti[0] === 'E').length;
+  const iCount = lastTeam.filter(p => p.mbti && p.mbti[0] === 'I').length;
+  const belbinBycat = {};
+  lastTeam.forEach(p => {
+    const c = BELBIN_CAT[p.belbin] || 'Other';
+    (belbinBycat[c] = belbinBycat[c] || []).push(p);
+  });
+  const actionCount = (belbinBycat['Action']   || []).length;
+  const thinkCount  = (belbinBycat['Thinking'] || []).length;
+  const socialCount = (belbinBycat['Social']   || []).length;
+  const cats = ['Action','Thinking','Social'].filter(c => belbinBycat[c]);
+
+  const stats = [
+    { num: String(lastTeam.length),                            label: 'TEAM MEMBERS' },
+    { num: `${eCount}E · ${iCount}I`,                         label: 'ENERGY BALANCE' },
+    { num: `${actionCount} · ${thinkCount} · ${socialCount}`, label: 'ACT · THINK · SOCIAL' },
+    { num: `${cats.length}/3`,                                 label: 'BELBIN COVERAGE' },
+  ];
+
+  const statW = 13.33 / 4;
+  stats.forEach((s, i) => {
+    if (i > 0) {
+      slide.addShape(pptx.ShapeType.rect, {
+        x: i * statW, y: 1.36, w: 0.01, h: 0.72,
+        fill: { color: GRAY200 }, line: { type: 'none' }
+      });
+    }
+    slide.addText(s.num, {
+      x: i * statW + 0.15, y: 1.36, w: statW - 0.3, h: 0.42,
+      fontSize: 19, bold: true, color: NAVY, align: 'center', fontFace: 'Calibri'
+    });
+    slide.addText(s.label, {
+      x: i * statW + 0.15, y: 1.8, w: statW - 0.3, h: 0.18,
+      fontSize: 7, color: GRAY400, align: 'center', charSpacing: 1.5, fontFace: 'Calibri'
+    });
+  });
+
+  // Thin divider under stats
+  slide.addShape(pptx.ShapeType.rect, {
+    x: 0.3, y: 2.1, w: 12.73, h: 0.01,
+    fill: { color: GRAY200 }, line: { type: 'none' }
+  });
+
+  // "RECOMMENDED TEAM" section label
+  slide.addShape(pptx.ShapeType.rect, {
+    x: 0.3, y: 2.18, w: 0.035, h: 0.2,
+    fill: { color: PINK }, line: { type: 'none' }
+  });
+  slide.addText('RECOMMENDED TEAM', {
+    x: 0.42, y: 2.15, w: 5, h: 0.24,
+    fontSize: 8.5, bold: true, color: GRAY400, charSpacing: 2, fontFace: 'Calibri'
+  });
+
+  // ── TEAM MEMBER CARDS ─────────────────────────────────────
+  const cols        = Math.min(lastTeam.length, 3);
+  const rows        = Math.ceil(lastTeam.length / cols);
+  const marginX     = 0.3;
+  const gapX        = 0.15;
+  const totalCardW  = 13.33 - 2 * marginX;
+  const cardW       = (totalCardW - (cols - 1) * gapX) / cols;
+  const cardsStartY = 2.48;
+  const cardsEndY   = 5.9;
+  const gapY        = 0.15;
+  const cardH       = (cardsEndY - cardsStartY - (rows - 1) * gapY) / rows;
+
+  lastTeam.forEach((p, i) => {
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+    const cx  = marginX + col * (cardW + gapX);
+    const cy  = cardsStartY + row * (cardH + gapY);
+
+    slide.addShape(pptx.ShapeType.roundRect, {
+      x: cx, y: cy, w: cardW, h: cardH,
+      fill: { color: GRAY100 }, line: { color: GRAY200, width: 0.75 }, rectRadius: 0.07
+    });
+
+    // Rank badge
+    const rbSize = 0.28;
+    slide.addShape(pptx.ShapeType.ellipse, {
+      x: cx + cardW - rbSize - 0.15, y: cy + 0.14, w: rbSize, h: rbSize,
+      fill: { color: NAVY }, line: { type: 'none' }
+    });
+    slide.addText(String(i + 1), {
+      x: cx + cardW - rbSize - 0.15, y: cy + 0.14, w: rbSize, h: rbSize,
+      fontSize: 9, bold: true, color: WHITE, align: 'center', valign: 'middle', fontFace: 'Calibri'
+    });
+
+    // Avatar
+    const avIdx     = people.findIndex(x => x.name === p.name);
+    const avPalette = AVATAR_PALETTES[(avIdx >= 0 ? avIdx : i) % AVATAR_PALETTES.length];
+    const avBg      = avPalette.bg.replace('#', '');
+    const avFg      = avPalette.text.replace('#', '');
+    const avSize    = Math.min(cardH * 0.35, 0.62);
+    const avX       = cx + 0.18;
+    const avY       = cy + 0.14;
+
+    slide.addShape(pptx.ShapeType.ellipse, {
+      x: avX, y: avY, w: avSize, h: avSize,
+      fill: { color: avBg }, line: { type: 'none' }
+    });
+    slide.addText(initials(p.name), {
+      x: avX, y: avY, w: avSize, h: avSize,
+      fontSize: Math.round(avSize * 14), bold: true, color: avFg,
+      align: 'center', valign: 'middle', fontFace: 'Calibri'
+    });
+
+    // Name + role
+    const txtX = avX + avSize + 0.14;
+    const txtW = cardW - (avX - cx) - avSize - 0.14 - rbSize - 0.45;
+    slide.addText(p.name, {
+      x: txtX, y: cy + 0.15, w: txtW, h: 0.26,
+      fontSize: 11, bold: true, color: NAVY, fontFace: 'Calibri', valign: 'middle'
+    });
+    slide.addText(p.role, {
+      x: txtX, y: cy + 0.43, w: txtW, h: 0.2,
+      fontSize: 8.5, color: GRAY400, fontFace: 'Calibri'
+    });
+
+    // Belbin / MBTI / Strength badge row
+    const bH = 0.21;
+    const bY = cy + cardH - bH - 0.15;
+    let bX   = cx + 0.18;
+
+    function drawBadge(text, bg, fg) {
+      if (!text) return;
+      const bW    = Math.max(text.length * 0.058 + 0.15, 0.38);
+      const maxBX = cx + cardW - 0.18;
+      if (bX + bW > maxBX) return;
+      slide.addShape(pptx.ShapeType.roundRect, {
+        x: bX, y: bY, w: bW, h: bH,
+        fill: { color: bg }, line: { type: 'none' }, rectRadius: 0.1
+      });
+      slide.addText(text, {
+        x: bX, y: bY, w: bW, h: bH,
+        fontSize: 7.5, bold: true, color: fg,
+        align: 'center', valign: 'middle', fontFace: 'Calibri'
+      });
+      bX += bW + 0.09;
+    }
+
+    drawBadge(p.belbin,   'E1F5EE', '0A5C42');
+    drawBadge(p.mbti,     'E8F0FB', '1A3A72');
+    drawBadge(p.strength, 'FEF3DC', '8A5200');
+  });
+
+  // ── KEY INSIGHTS ──────────────────────────────────────────
+  const insightsData = [];
+  if (actionCount > 0 && thinkCount > 0 && socialCount > 0)
+    insightsData.push({ type: 'green', text: 'Full Belbin coverage across Action, Thinking & Social roles.' });
+  if (eCount > 0 && iCount > 0)
+    insightsData.push({ type: 'green', text: `Good introvert/extrovert balance (${eCount}E / ${iCount}I).` });
+  const topStrengths = lastTeam.filter(p => p.strength).map(p => `${p.name.split(' ')[0]}: ${p.strength}`);
+  if (topStrengths.length)
+    insightsData.push({ type: 'green', text: `Strengths — ${topStrengths.join(' · ')}` });
+  if (eCount === 0)
+    insightsData.push({ type: 'amber', text: 'All introverts — build in structured moments to surface ideas aloud.' });
+  if (iCount === 0)
+    insightsData.push({ type: 'amber', text: 'All extroverts — create space for deep reflection before decisions.' });
+  if (actionCount > thinkCount + 1)
+    insightsData.push({ type: 'amber', text: 'Action-heavy team — consider adding a Monitor Evaluator or Plant.' });
+  if (thinkCount > actionCount + 1)
+    insightsData.push({ type: 'amber', text: 'Thinking-heavy team — consider adding a Shaper or Implementer.' });
+  if (actionCount === 0)
+    insightsData.push({ type: 'red', text: 'No Action roles (Shaper, Implementer, Completer Finisher) — risk of paralysis.' });
+  if (thinkCount === 0)
+    insightsData.push({ type: 'red', text: 'No Thinking roles (Plant, Monitor Evaluator, Specialist) — ideas may go unchallenged.' });
+  if (socialCount === 0)
+    insightsData.push({ type: 'red', text: 'No Social roles (Co-ordinator, Resource Investigator, Teamworker) — risk of cohesion issues.' });
+
+  const dotColors  = { green: GREEN,   amber: AMBER,   red: RED   };
+  const labelBgs   = { green: GREENBG, amber: AMBERBG, red: REDBG };
+  const labelNames = { green: 'STRENGTH', amber: 'WATCH', red: 'GAP' };
+
+  insightsData.slice(0, 3).forEach((ins, i) => {
+    const iy = 5.98 + i * 0.28;
+    slide.addShape(pptx.ShapeType.ellipse, {
+      x: 0.3, y: iy + 0.06, w: 0.11, h: 0.11,
+      fill: { color: dotColors[ins.type] }, line: { type: 'none' }
+    });
+    slide.addShape(pptx.ShapeType.roundRect, {
+      x: 0.48, y: iy + 0.01, w: 0.7, h: 0.21,
+      fill: { color: labelBgs[ins.type] }, line: { type: 'none' }, rectRadius: 0.1
+    });
+    slide.addText(labelNames[ins.type], {
+      x: 0.48, y: iy + 0.01, w: 0.7, h: 0.21,
+      fontSize: 6.5, bold: true, color: dotColors[ins.type],
+      align: 'center', valign: 'middle', fontFace: 'Calibri'
+    });
+    slide.addText(ins.text, {
+      x: 1.25, y: iy, w: 11.75, h: 0.24,
+      fontSize: 8.5, color: GRAY600, fontFace: 'Calibri', valign: 'middle'
+    });
+  });
+
+  // ── FOOTER ────────────────────────────────────────────────
+  slide.addShape(pptx.ShapeType.rect, {
+    x: 0, y: 7.1, w: '100%', h: 0.4,
+    fill: { color: NAVY }, line: { type: 'none' }
+  });
+  slide.addText('IBL Energy Ltd  ·  Team Builder  ·  Belbin · Myers-Briggs · StrengthScope', {
+    x: 0.3, y: 7.12, w: 12.73, h: 0.28,
+    fontSize: 8, color: '3C5070', align: 'center', fontFace: 'Calibri'
+  });
+
+  // Trigger download
+  const fileName = (lastProjName || 'Team').replace(/[^\w\s-]/g, '').trim() || 'Team-Builder';
+  pptx.writeFile({ fileName: `${fileName} - Team` });
 }
 
 renderPeople();
