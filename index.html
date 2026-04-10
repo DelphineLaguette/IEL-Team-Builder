@@ -944,9 +944,13 @@
 <div id="view-fit">
 <div class="container">
 
-  <div style="display:flex;align-items:center;margin-bottom:1.5rem">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem">
     <button class="back-btn" style="margin-bottom:0" onclick="showSetup()">
       ← Back to team builder
+    </button>
+    <button class="btn btn-pink" onclick="exportFitToPowerPoint()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+      Export to PowerPoint
     </button>
   </div>
 
@@ -1004,6 +1008,7 @@ const AVATAR_PALETTES = [
 ];
 
 let lastTeam = [], lastProjName = '', lastType = '';
+let lastFitResults = [];
 
 let people = [
   {name:'Delphine Laguette', role:'Team Engagement Lead', belbin:'Co-ordinator', mbti:'ENFJ', strength:'Developing Others'},
@@ -1325,6 +1330,7 @@ function renderFitResults(){
     })).sort((a,b)=>b.s-a.s);
     return {...p, typeScores, idx:i};
   });
+  lastFitResults = results;
 
   document.getElementById('fit-output').innerHTML = results.map((p,i)=>{
     const av = getAvatar(p.idx);
@@ -1375,6 +1381,226 @@ function renderFitResults(){
       </div>
     </div>`;
   }).join('');
+}
+
+function exportFitToPowerPoint() {
+  if (!lastFitResults || !lastFitResults.length) {
+    alert('No fit analysis to export. Please run "Find best fit" first.');
+    return;
+  }
+
+  const pptx = new PptxGenJS();
+  pptx.layout = 'LAYOUT_WIDE';
+
+  const NAVY    = '0B2145', PINK    = 'FF51A1';
+  const CREAM   = 'FAF8F4', WHITE   = 'FFFFFF';
+  const GRAY100 = 'F4F2EE', GRAY200 = 'E8E5DF';
+  const GRAY400 = '9E9B95', GRAY600 = '5C5A56';
+
+  const TYPE_COLORS = {
+    innovation:'FF51A1', execution:'1A7F5A', change:'B06A00',
+    client:'0077CC',     strategy:'1A3A72',  culture:'7B3FA0'
+  };
+  const TYPE_BG = {
+    innovation:'FFE8F4', execution:'E1F5EE', change:'FEF3DC',
+    client:'E8F4FF',     strategy:'E8EBF5',  culture:'F0EAFF'
+  };
+  const CAT_COLORS = { Action:'FF51A1', Thinking:'1A3A72', Social:'0A8A5A' };
+  const CAT_BG     = { Action:'FFE8F4', Thinking:'E8EBF5', Social:'E1F5EE' };
+
+  function buildSlide(chunk, slideIdx, totalSlides) {
+    const slide = pptx.addSlide();
+    slide.background = { color: CREAM };
+
+    // Header bar
+    slide.addShape(pptx.ShapeType.rect, {
+      x: 0, y: 0, w: '100%', h: 1.3,
+      fill: { color: NAVY }, line: { type: 'none' }
+    });
+    // Teal logo square
+    slide.addShape(pptx.ShapeType.roundRect, {
+      x: 0.32, y: 0.22, w: 0.58, h: 0.58,
+      fill: { color: '4BBFC9' }, line: { type: 'none' }, rectRadius: 0.06
+    });
+    slide.addText('iBL', {
+      x: 0.32, y: 0.22, w: 0.58, h: 0.58,
+      fontSize: 13, bold: true, color: WHITE,
+      align: 'center', valign: 'middle', fontFace: 'Calibri'
+    });
+    slide.addText('IBL Energy', {
+      x: 1.06, y: 0.21, w: 3.5, h: 0.3,
+      fontSize: 15, bold: true, color: WHITE, fontFace: 'Calibri'
+    });
+    slide.addText('TEAM BUILDER', {
+      x: 1.06, y: 0.53, w: 3.5, h: 0.2,
+      fontSize: 7.5, color: '7A99BB', charSpacing: 2.5, fontFace: 'Calibri'
+    });
+    slide.addText('Best Fit Analysis', {
+      x: 4.8, y: 0.13, w: 8.2, h: 0.65,
+      fontSize: 26, bold: true, italic: true,
+      color: WHITE, align: 'right', fontFace: 'Calibri'
+    });
+    slide.addText(totalSlides > 1 ? `WHERE EACH PERSON FITS BEST  ·  PART ${slideIdx + 1} OF ${totalSlides}` : 'WHERE EACH PERSON FITS BEST', {
+      x: 4.8, y: 0.82, w: 8.2, h: 0.22,
+      fontSize: 8.5, color: '6A8FAF', align: 'right', charSpacing: 1.5, fontFace: 'Calibri'
+    });
+
+    // Stat strip
+    slide.addShape(pptx.ShapeType.rect, {
+      x: 0, y: 1.3, w: '100%', h: 0.65,
+      fill: { color: GRAY100 }, line: { type: 'none' }
+    });
+    slide.addText(`${lastFitResults.length} people analysed  ·  6 project types evaluated`, {
+      x: 0.3, y: 1.42, w: 12.73, h: 0.35,
+      fontSize: 10, color: GRAY600, align: 'center', fontFace: 'Calibri'
+    });
+
+    // Cards: 2 columns
+    const cols = 2;
+    const rows = Math.ceil(chunk.length / cols);
+    const marginX = 0.3, gapX = 0.2, gapY = 0.16;
+    const cardW = (13.33 - 2 * marginX - (cols - 1) * gapX) / cols;
+    const cardsStartY = 2.08, cardsEndY = 7.0;
+    const cardH = (cardsEndY - cardsStartY - (rows - 1) * gapY) / rows;
+
+    chunk.forEach((p, i) => {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      const cx  = marginX + col * (cardW + gapX);
+      const cy  = cardsStartY + row * (cardH + gapY);
+
+      // Card
+      slide.addShape(pptx.ShapeType.roundRect, {
+        x: cx, y: cy, w: cardW, h: cardH,
+        fill: { color: WHITE }, line: { color: GRAY200, width: 0.75 }, rectRadius: 0.07
+      });
+
+      // Avatar
+      const av  = AVATAR_PALETTES[p.idx % AVATAR_PALETTES.length];
+      const avBg = av.bg.replace('#',''), avFg = av.text.replace('#','');
+      const avSz = 0.52, avX = cx + 0.18, avY = cy + 0.18;
+      slide.addShape(pptx.ShapeType.ellipse, {
+        x: avX, y: avY, w: avSz, h: avSz,
+        fill: { color: avBg }, line: { type: 'none' }
+      });
+      slide.addText(initials(p.name), {
+        x: avX, y: avY, w: avSz, h: avSz,
+        fontSize: 14, bold: true, color: avFg,
+        align: 'center', valign: 'middle', fontFace: 'Calibri'
+      });
+
+      // Name + role (left half)
+      const leftW = cardW * 0.48;
+      const nameX = avX + avSz + 0.13;
+      const nameW = leftW - avSz - 0.35;
+      slide.addText(p.name, {
+        x: nameX, y: cy + 0.18, w: nameW, h: 0.26,
+        fontSize: 10.5, bold: true, color: NAVY, fontFace: 'Calibri', valign: 'middle'
+      });
+      slide.addText(p.role, {
+        x: nameX, y: cy + 0.46, w: nameW, h: 0.2,
+        fontSize: 8, color: GRAY400, fontFace: 'Calibri'
+      });
+
+      // Profile badges (bottom-left)
+      const bH = 0.19, bY = cy + cardH - bH - 0.14;
+      let bX = cx + 0.18;
+      function badge(text, bg, fg) {
+        if (!text) return;
+        const bW = Math.max(text.length * 0.054 + 0.13, 0.34);
+        if (bX + bW > cx + leftW) return;
+        slide.addShape(pptx.ShapeType.roundRect, {
+          x: bX, y: bY, w: bW, h: bH,
+          fill: { color: bg }, line: { type: 'none' }, rectRadius: 0.09
+        });
+        slide.addText(text, {
+          x: bX, y: bY, w: bW, h: bH,
+          fontSize: 6.5, bold: true, color: fg,
+          align: 'center', valign: 'middle', fontFace: 'Calibri'
+        });
+        bX += bW + 0.08;
+      }
+      badge(p.belbin, 'E1F5EE', '0A5C42');
+      badge(p.mbti,   'E8F0FB', '1A3A72');
+
+      // Vertical divider
+      const divX = cx + leftW;
+      slide.addShape(pptx.ShapeType.rect, {
+        x: divX, y: cy + 0.14, w: 0.01, h: cardH - 0.28,
+        fill: { color: GRAY200 }, line: { type: 'none' }
+      });
+
+      // Right half — best fit
+      const rightX = divX + 0.18;
+      const rightW = cardW - leftW - 0.28;
+      const best   = p.typeScores[0];
+      const others = p.typeScores.slice(1, 3).filter(t => t.s > 0);
+      const belbinCat = BELBIN_CAT[p.belbin] || '';
+
+      slide.addText('BEST FIT FOR', {
+        x: rightX, y: cy + 0.18, w: rightW, h: 0.16,
+        fontSize: 6.5, bold: true, color: GRAY400, charSpacing: 1.5, fontFace: 'Calibri'
+      });
+
+      const typeColor = TYPE_COLORS[best.type] || PINK;
+      const typeBg    = TYPE_BG[best.type]    || 'FFE8F4';
+      const pillH = 0.3;
+      slide.addShape(pptx.ShapeType.roundRect, {
+        x: rightX, y: cy + 0.37, w: rightW - 0.05, h: pillH,
+        fill: { color: typeBg }, line: { color: typeColor, width: 0.5 }, rectRadius: 0.08
+      });
+      slide.addShape(pptx.ShapeType.ellipse, {
+        x: rightX + 0.1, y: cy + 0.37 + pillH / 2 - 0.06, w: 0.12, h: 0.12,
+        fill: { color: typeColor }, line: { type: 'none' }
+      });
+      slide.addText(best.label, {
+        x: rightX + 0.27, y: cy + 0.37, w: rightW - 0.37, h: pillH,
+        fontSize: 9, bold: true, color: typeColor,
+        valign: 'middle', fontFace: 'Calibri'
+      });
+
+      if (others.length) {
+        slide.addText(`Also: ${others.map(t => t.label).join(' · ')}`, {
+          x: rightX, y: cy + 0.72, w: rightW, h: 0.2,
+          fontSize: 7.5, color: GRAY600, fontFace: 'Calibri'
+        });
+      }
+
+      if (belbinCat) {
+        const catColor = CAT_COLORS[belbinCat] || GRAY600;
+        const catBg    = CAT_BG[belbinCat]    || GRAY100;
+        slide.addShape(pptx.ShapeType.roundRect, {
+          x: rightX, y: cy + cardH - 0.36, w: 0.8, h: 0.22,
+          fill: { color: catBg }, line: { type: 'none' }, rectRadius: 0.07
+        });
+        slide.addText(belbinCat.toUpperCase(), {
+          x: rightX, y: cy + cardH - 0.36, w: 0.8, h: 0.22,
+          fontSize: 7, bold: true, color: catColor,
+          align: 'center', valign: 'middle', fontFace: 'Calibri'
+        });
+      }
+    });
+
+    // Footer
+    slide.addShape(pptx.ShapeType.rect, {
+      x: 0, y: 7.1, w: '100%', h: 0.4,
+      fill: { color: NAVY }, line: { type: 'none' }
+    });
+    slide.addText('IEL Team Builder  ·  Belbin · Myers-Briggs · StrengthScope', {
+      x: 0.3, y: 7.12, w: 12.73, h: 0.28,
+      fontSize: 8, color: '3C5070', align: 'center', fontFace: 'Calibri'
+    });
+  }
+
+  // Split into slides of 6 (2 cols × 3 rows)
+  const perSlide = 6;
+  const chunks = [];
+  for (let i = 0; i < lastFitResults.length; i += perSlide) {
+    chunks.push(lastFitResults.slice(i, i + perSlide));
+  }
+  chunks.forEach((chunk, idx) => buildSlide(chunk, idx, chunks.length));
+
+  pptx.writeFile({ fileName: 'IEL-Best-Fit-Analysis' });
 }
 
 function exportToPowerPoint() {
