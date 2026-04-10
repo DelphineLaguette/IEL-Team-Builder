@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IBL Energy — Team Builder</title>
+<title>IEL Team Builder</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 <style>
@@ -54,31 +54,18 @@
     gap: 14px;
   }
 
-  .logo-mark {
-    width: 36px;
+  .logo-img {
     height: 36px;
-    background: var(--pink);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: auto;
+    object-fit: contain;
+    display: block;
   }
-
-  .logo-mark svg { width: 20px; height: 20px; }
 
   .logo-text {
     font-family: 'DM Serif Display', serif;
     font-size: 18px;
     color: var(--white);
     letter-spacing: 0.01em;
-  }
-
-  .logo-sub {
-    font-size: 11px;
-    color: rgba(255,255,255,0.45);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin-top: 1px;
   }
 
   .header-right {
@@ -646,15 +633,8 @@
 
 <header>
   <div class="logo">
-    <div class="logo-mark">
-      <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M10 2L13 8H17L13.5 12L15 18L10 15L5 18L6.5 12L3 8H7L10 2Z" fill="white" opacity="0.9"/>
-      </svg>
-    </div>
-    <div>
-      <div class="logo-text">IBL Energy</div>
-      <div class="logo-sub">Team Builder</div>
-    </div>
+    <img class="logo-img" src="logo.png" alt="IBL Energy Ltd">
+    <div class="logo-text">IEL Team Builder</div>
   </div>
   <div class="header-right">
     <div class="step-indicator" id="step-indicator">
@@ -887,7 +867,7 @@
 </div>
 
 <footer>
-  IBL Energy Ltd &nbsp;·&nbsp; Team Builder &nbsp;·&nbsp; Powered by Belbin · Myers-Briggs · StrengthScope
+  IEL Team Builder &nbsp;·&nbsp; Powered by Belbin · Myers-Briggs · StrengthScope
 </footer>
 
 <script>
