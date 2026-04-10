@@ -394,8 +394,59 @@
   .cta-bar strong { color: var(--white); }
 
   /* ── RESULTS ── */
-  #view-results { display: none; }
-  #view-fit     { display: none; }
+  #view-results  { display: none; }
+  #view-fit      { display: none; }
+  #view-people   { display: none; }
+
+  /* ── TEXTAREA ── */
+  .form-group textarea {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--navy);
+    background: var(--gray-100);
+    border: 1.5px solid transparent;
+    border-radius: 10px;
+    outline: none;
+    resize: vertical;
+    transition: border-color .2s, background .2s;
+    min-height: 80px;
+    line-height: 1.5;
+  }
+  .form-group textarea:focus {
+    border-color: var(--pink);
+    background: var(--white);
+  }
+
+  /* ── UPLOAD ZONE ── */
+  .upload-zone {
+    border: 2px dashed var(--gray-200);
+    border-radius: 12px;
+    padding: 1.75rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+    margin-top: .5rem;
+  }
+  .upload-zone:hover, .upload-zone.dragover {
+    border-color: var(--pink);
+    background: rgba(255,81,161,0.04);
+  }
+  .upload-zone-icon { font-size: 24px; margin-bottom: .4rem; color: var(--gray-400); line-height: 1; }
+  .upload-zone-text { font-size: 13px; font-weight: 500; color: var(--navy); margin-bottom: .25rem; }
+  .upload-zone-hint { font-size: 11px; color: var(--gray-400); }
+
+  /* ── PEOPLE BAR ── */
+  .people-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--gray-100);
+    border-radius: 12px;
+    padding: .875rem 1.25rem;
+    margin-bottom: 1.5rem;
+  }
 
   .results-header {
     background: var(--navy);
@@ -667,113 +718,60 @@
     </div>
   </div>
 
-  <div class="two-col" style="align-items:start;margin-bottom:1.5rem">
-
-    <!-- LEFT: Project -->
-    <div>
-      <div class="panel">
-        <div class="panel-title">Project definition</div>
-        <div class="form-group">
-          <label>Project name</label>
-          <input type="text" id="proj-name" placeholder="e.g. Digital transformation Q3 2026">
-        </div>
-        <div class="two-col">
-          <div class="form-group">
-            <label>Team size needed</label>
-            <select id="team-size">
-              <option value="2">2 people</option>
-              <option value="3">3 people</option>
-              <option value="4" selected>4 people</option>
-              <option value="5">5 people</option>
-              <option value="6">6 people</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Project type</label>
-            <select id="proj-type">
-              <option value="innovation">Innovation & new ideas</option>
-              <option value="execution">Execution & delivery</option>
-              <option value="change">Change management</option>
-              <option value="client">Client / stakeholder</option>
-              <option value="strategy">Strategy & planning</option>
-              <option value="culture">Culture & people</option>
-            </select>
-          </div>
-        </div>
+  <!-- Project definition -->
+  <div class="panel" style="margin-bottom:1.25rem">
+    <div class="panel-title">Project definition</div>
+    <div class="form-group">
+      <label>Project name</label>
+      <input type="text" id="proj-name" placeholder="e.g. Digital transformation Q3 2026">
+    </div>
+    <div class="form-group">
+      <label>Project description</label>
+      <textarea id="proj-desc" placeholder="Briefly describe the project goals, challenges or context…"></textarea>
+    </div>
+    <div class="two-col">
+      <div class="form-group" style="margin-bottom:0">
+        <label>Team size needed <span style="font-weight:400;color:var(--gray-400)">(2 – 50)</span></label>
+        <input type="number" id="team-size" min="2" max="50" value="4" placeholder="e.g. 8">
       </div>
-
-      <!-- ADD PERSON -->
-      <div class="add-panel" style="margin-top:1.25rem">
-        <div class="panel-title">Add a team member</div>
-        <div class="two-col">
-          <div class="form-group">
-            <label>Full name</label>
-            <input type="text" id="new-name" placeholder="Firstname Lastname">
-          </div>
-          <div class="form-group">
-            <label>Role / Department</label>
-            <input type="text" id="new-role" placeholder="e.g. Finance Manager">
-          </div>
-        </div>
-        <div class="three-col">
-          <div class="form-group">
-            <label>Belbin role (primary)</label>
-            <select id="new-belbin">
-              <option value="">— select —</option>
-              <option>Plant</option>
-              <option>Resource Investigator</option>
-              <option>Co-ordinator</option>
-              <option>Shaper</option>
-              <option>Monitor Evaluator</option>
-              <option>Teamworker</option>
-              <option>Implementer</option>
-              <option>Completer Finisher</option>
-              <option>Specialist</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Myers-Briggs type</label>
-            <select id="new-mbti">
-              <option value="">— select —</option>
-              <option>INTJ</option><option>INTP</option><option>ENTJ</option><option>ENTP</option>
-              <option>INFJ</option><option>INFP</option><option>ENFJ</option><option>ENFP</option>
-              <option>ISTJ</option><option>ISFJ</option><option>ESTJ</option><option>ESFJ</option>
-              <option>ISTP</option><option>ISFP</option><option>ESTP</option><option>ESFP</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Top StrengthScope</label>
-            <select id="new-strength">
-              <option value="">— select —</option>
-              <option>Achievement</option><option>Catalyst</option><option>Collaboration</option>
-              <option>Common Sense</option><option>Compassion</option><option>Courage</option>
-              <option>Creativity</option><option>Detail</option><option>Developing Others</option>
-              <option>Efficiency</option><option>Emotional Control</option><option>Empathy</option>
-              <option>Enthusiasm</option><option>Flexibility</option><option>Focus</option>
-              <option>Humility</option><option>Inclusion</option><option>Initiative</option>
-              <option>Judgment</option><option>Leading</option><option>Optimism</option>
-              <option>Persuasion</option><option>Relationship Building</option>
-              <option>Resilience</option><option>Self-Confidence</option>
-              <option>Self-Improvement</option><option>Strategic Mindedness</option>
-              <option>Work Ethic</option>
-            </select>
-          </div>
-        </div>
-        <button class="btn btn-primary" onclick="addPerson()">+ Add to database</button>
+      <div class="form-group" style="margin-bottom:0">
+        <label>Project type</label>
+        <select id="proj-type">
+          <option value="innovation">Innovation & new ideas</option>
+          <option value="execution">Execution & delivery</option>
+          <option value="change">Change management</option>
+          <option value="client">Client / stakeholder</option>
+          <option value="strategy">Strategy & planning</option>
+          <option value="culture">Culture & people</option>
+        </select>
       </div>
     </div>
+  </div>
 
-    <!-- RIGHT: People list -->
-    <div class="panel" style="min-height:300px">
-      <div class="panel-title" style="justify-content:space-between">
-        <span>People database</span>
-        <span id="people-count" style="font-size:11px;color:var(--gray-400);font-weight:400;background:var(--gray-100);padding:2px 10px;border-radius:99px">0 people</span>
-      </div>
-      <div id="people-list">
-        <div class="empty-state">No team members yet.<br>Add your first person on the left.</div>
-      </div>
+  <!-- Document upload -->
+  <div class="panel" style="margin-bottom:1.25rem">
+    <div class="panel-title">Project document <span style="font-weight:400;font-size:10px;color:var(--gray-400);text-transform:none;letter-spacing:0;background:var(--gray-100);padding:2px 8px;border-radius:99px;margin-left:4px">optional</span></div>
+    <p style="font-size:13px;color:var(--gray-600);line-height:1.5;margin-bottom:.75rem">Upload a brief, memo or project description and the algorithm will read it to suggest the right project type automatically.</p>
+    <div class="upload-zone" id="upload-zone"
+         onclick="document.getElementById('doc-input').click()"
+         ondragover="event.preventDefault();this.classList.add('dragover')"
+         ondragleave="this.classList.remove('dragover')"
+         ondrop="handleDrop(event)">
+      <input type="file" id="doc-input" accept=".txt,.pdf,.doc,.docx" style="display:none" onchange="handleFileSelect(event)">
+      <div class="upload-zone-icon">&#8679;</div>
+      <div class="upload-zone-text" id="upload-zone-text">Drop a document here or click to browse</div>
+      <div class="upload-zone-hint">.txt &nbsp;·&nbsp; .pdf &nbsp;·&nbsp; .doc &nbsp;·&nbsp; .docx</div>
     </div>
+    <div id="upload-result"></div>
+  </div>
 
+  <!-- People database bar -->
+  <div class="people-bar">
+    <div style="display:flex;align-items:center;gap:.75rem">
+      <span style="font-size:14px;font-weight:600;color:var(--navy)">People database</span>
+      <span id="people-count-main" style="font-size:11px;color:var(--gray-400);font-weight:400;background:var(--white);padding:2px 10px;border-radius:99px;border:1px solid var(--gray-200)">5 people</span>
+    </div>
+    <button class="btn btn-ghost" style="font-size:13px" onclick="showPeople()">Manage team members &rarr;</button>
   </div>
 
   <!-- CTA -->
@@ -848,6 +846,97 @@
     <div id="analysis-output"></div>
   </div>
 
+</div>
+</div>
+
+<!-- ══ VIEW: PEOPLE DATABASE ══════════════════════════════════════════ -->
+<div id="view-people">
+<div class="container">
+
+  <div style="display:flex;align-items:center;margin-bottom:1.5rem">
+    <button class="back-btn" style="margin-bottom:0" onclick="showSetup()">
+      ← Back to team builder
+    </button>
+  </div>
+
+  <div class="results-header" style="margin-bottom:1.5rem">
+    <div class="results-breadcrumb">People database</div>
+    <div class="results-title"><em>Team members & profiles</em></div>
+    <div class="results-meta">
+      <div class="results-meta-item"><strong id="people-count">5 people</strong> · in database</div>
+    </div>
+  </div>
+
+  <div class="two-col" style="align-items:start">
+
+    <!-- Add person form -->
+    <div class="add-panel" style="margin-top:0">
+      <div class="panel-title">Add a team member</div>
+      <div class="two-col">
+        <div class="form-group">
+          <label>Full name</label>
+          <input type="text" id="new-name" placeholder="Firstname Lastname">
+        </div>
+        <div class="form-group">
+          <label>Role / Department</label>
+          <input type="text" id="new-role" placeholder="e.g. Finance Manager">
+        </div>
+      </div>
+      <div class="three-col">
+        <div class="form-group">
+          <label>Belbin role (primary)</label>
+          <select id="new-belbin">
+            <option value="">— select —</option>
+            <option>Plant</option>
+            <option>Resource Investigator</option>
+            <option>Co-ordinator</option>
+            <option>Shaper</option>
+            <option>Monitor Evaluator</option>
+            <option>Teamworker</option>
+            <option>Implementer</option>
+            <option>Completer Finisher</option>
+            <option>Specialist</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Myers-Briggs type</label>
+          <select id="new-mbti">
+            <option value="">— select —</option>
+            <option>INTJ</option><option>INTP</option><option>ENTJ</option><option>ENTP</option>
+            <option>INFJ</option><option>INFP</option><option>ENFJ</option><option>ENFP</option>
+            <option>ISTJ</option><option>ISFJ</option><option>ESTJ</option><option>ESFJ</option>
+            <option>ISTP</option><option>ISFP</option><option>ESTP</option><option>ESFP</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Top StrengthScope</label>
+          <select id="new-strength">
+            <option value="">— select —</option>
+            <option>Achievement</option><option>Catalyst</option><option>Collaboration</option>
+            <option>Common Sense</option><option>Compassion</option><option>Courage</option>
+            <option>Creativity</option><option>Detail</option><option>Developing Others</option>
+            <option>Efficiency</option><option>Emotional Control</option><option>Empathy</option>
+            <option>Enthusiasm</option><option>Flexibility</option><option>Focus</option>
+            <option>Humility</option><option>Inclusion</option><option>Initiative</option>
+            <option>Judgment</option><option>Leading</option><option>Optimism</option>
+            <option>Persuasion</option><option>Relationship Building</option>
+            <option>Resilience</option><option>Self-Confidence</option>
+            <option>Self-Improvement</option><option>Strategic Mindedness</option>
+            <option>Work Ethic</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="addPerson()">+ Add to database</button>
+    </div>
+
+    <!-- People list -->
+    <div class="panel" style="min-height:300px">
+      <div id="people-list">
+        <div class="empty-state">No team members yet.<br>Add your first person on the left.</div>
+      </div>
+    </div>
+
+  </div>
 </div>
 </div>
 
@@ -930,7 +1019,10 @@ function getAvatar(i){ return AVATAR_PALETTES[i % AVATAR_PALETTES.length]; }
 
 function renderPeople(){
   const el = document.getElementById('people-list');
-  document.getElementById('people-count').textContent = people.length + ' ' + (people.length===1?'person':'people');
+  const countText = people.length + ' ' + (people.length===1?'person':'people');
+  document.getElementById('people-count').textContent = countText;
+  const mainBadge = document.getElementById('people-count-main');
+  if(mainBadge) mainBadge.textContent = countText;
   if(!people.length){
     el.innerHTML = '<div class="empty-state">No team members yet.<br>Add your first person on the left.</div>';
     return;
@@ -985,8 +1077,12 @@ function buildTeam(){
   const type     = document.getElementById('proj-type').value;
   const needs    = PROJECT_NEEDS[type] || [];
 
+  if(isNaN(size) || size < 2 || size > 50){
+    alert('Please enter a team size between 2 and 50.');
+    return;
+  }
   if(people.length < size){
-    alert(`You need at least ${size} people in the database. Currently: ${people.length}.`);
+    alert(`You need at least ${size} people in the database. Currently: ${people.length}.\n\nGo to "Manage team members" to add more people.`);
     return;
   }
 
@@ -1129,10 +1225,69 @@ function showSetup(){
   document.getElementById('view-setup').style.display='block';
   document.getElementById('view-results').style.display='none';
   document.getElementById('view-fit').style.display='none';
+  document.getElementById('view-people').style.display='none';
   document.getElementById('dot-1').className='step-dot active';
   document.getElementById('dot-2').className='step-dot';
   document.getElementById('dot-3').className='step-dot';
   window.scrollTo(0,0);
+}
+
+function showPeople(){
+  document.getElementById('view-setup').style.display='none';
+  document.getElementById('view-results').style.display='none';
+  document.getElementById('view-fit').style.display='none';
+  document.getElementById('view-people').style.display='block';
+  document.getElementById('dot-1').className='step-dot done';
+  document.getElementById('dot-2').className='step-dot active';
+  document.getElementById('dot-3').className='step-dot';
+  window.scrollTo(0,0);
+  renderPeople();
+}
+
+function handleFileSelect(e){
+  const file = e.target.files[0];
+  if(file) processDoc(file);
+}
+
+function handleDrop(e){
+  e.preventDefault();
+  document.getElementById('upload-zone').classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if(file) processDoc(file);
+}
+
+function processDoc(file){
+  document.getElementById('upload-zone-text').textContent = file.name;
+  const resultEl = document.getElementById('upload-result');
+  const isText = file.type==='text/plain' || file.name.endsWith('.txt');
+  if(isText){
+    const reader = new FileReader();
+    reader.onload = e => {
+      const text = e.target.result;
+      const best = detectProjectType(text);
+      document.getElementById('proj-type').value = best;
+      const desc = document.getElementById('proj-desc');
+      if(!desc.value) desc.value = text.trim().slice(0,600);
+      resultEl.innerHTML = `<div style="margin-top:.75rem;padding:.75rem 1rem;background:var(--green-bg);border-radius:8px;font-size:13px;color:var(--green)">
+        ✓ Document analysed — project type auto-set to <strong>${PROJECT_LABELS[best]}</strong>
+      </div>`;
+    };
+    reader.readAsText(file);
+  } else {
+    resultEl.innerHTML = `<div style="margin-top:.75rem;padding:.75rem 1rem;background:var(--gray-100);border-radius:8px;font-size:13px;color:var(--gray-600)">
+      ✓ <strong>${file.name}</strong> uploaded — please verify the project type selected above.
+    </div>`;
+  }
+}
+
+function detectProjectType(text){
+  const lower = text.toLowerCase();
+  const scores = Object.fromEntries(
+    Object.entries(PROJECT_NEEDS).map(([type,needs])=>[
+      type, needs.filter(k=>lower.includes(k.toLowerCase())).length
+    ])
+  );
+  return Object.entries(scores).sort((a,b)=>b[1]-a[1])[0][0];
 }
 
 function findBestFit(){
