@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { getAdminDb } from '@/lib/firebase/admin'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
@@ -30,9 +30,12 @@ const TEAM_STATEMENTS = [
   { key: 'team_trusts_word', label: 'My team trusts my word' },
 ]
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Reflection = Record<string, any>
+
 function RatingDots({ value }: { value: number }) {
   return (
-    <div className="flex gap-1.5 items-center">
+    <div className="flex gap-1.5 items-center flex-wrap">
       {[1, 2, 3, 4, 5].map(i => (
         <div
           key={i}
@@ -45,7 +48,7 @@ function RatingDots({ value }: { value: number }) {
           {i}
         </div>
       ))}
-      <span className="ml-2 text-sm text-gray-500">{value ? RATING_LABELS[value] : '–'}</span>
+      <span className="ml-1 text-sm text-gray-500">{value ? RATING_LABELS[value] : '–'}</span>
     </div>
   )
 }
@@ -70,18 +73,12 @@ function Row({ label, value }: { label: string; value?: string | null }) {
 
 export default async function LeaderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const supabase = await createClient()
+  const doc = await getAdminDb().collection('reflections').doc(id).get()
+  if (!doc.exists) notFound()
+  const r = doc.data() as Reflection
 
-  const { data: r } = await supabase
-    .from('reflections')
-    .select('*')
-    .eq('id', id)
-    .single()
-
-  if (!r) notFound()
-
-  const avgScore = PRINCIPLES.map(p => r[`${p.key}_rating`] || 0).filter(Boolean)
-  const avg = avgScore.length ? avgScore.reduce((a: number, b: number) => a + b, 0) / avgScore.length : 0
+  const scores = PRINCIPLES.map(p => r[`${p.key}_rating`] || 0).filter(Boolean)
+  const avg = scores.length ? scores.reduce((a: number, b: number) => a + b, 0) / scores.length : 0
 
   return (
     <div className="min-h-screen bg-cream">
@@ -99,7 +96,7 @@ export default async function LeaderDetailPage({ params }: { params: Promise<{ i
       </header>
 
       <main className="max-w-3xl mx-auto px-4 py-10 space-y-6">
-        {/* Score summary */}
+        {/* Score overview */}
         <div className="grid grid-cols-3 gap-3">
           <div className="bg-white rounded-2xl p-5 border border-gray-200 text-center">
             <p className="text-xs text-gray-400">Overall Average</p>
@@ -124,17 +121,15 @@ export default async function LeaderDetailPage({ params }: { params: Promise<{ i
           </div>
         </div>
 
-        {/* Personal Info */}
         <Section title="About">
           <div className="grid grid-cols-2 gap-4">
             <Row label="Name" value={r.leader_name} />
             <Row label="Email" value={r.email} />
             <Row label="Team" value={r.team} />
-            <Row label="Submitted" value={new Date(r.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })} />
+            <Row label="Last updated" value={r.updated_at ? new Date(r.updated_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '–'} />
           </div>
         </Section>
 
-        {/* Leadership Inspiration */}
         <Section title="Leadership Inspiration">
           <div className="space-y-3">
             <div>
@@ -149,7 +144,6 @@ export default async function LeaderDetailPage({ params }: { params: Promise<{ i
           </div>
         </Section>
 
-        {/* Team Perception */}
         <Section title="Team Perception">
           <div className="space-y-4">
             {TEAM_STATEMENTS.map(({ key, label }) => (
@@ -162,7 +156,6 @@ export default async function LeaderDetailPage({ params }: { params: Promise<{ i
           </div>
         </Section>
 
-        {/* Principles */}
         <Section title="Leadership Principles Self-Assessment">
           <div className="space-y-6">
             {PRINCIPLES.map(({ key, label }) => (
@@ -177,7 +170,6 @@ export default async function LeaderDetailPage({ params }: { params: Promise<{ i
           </div>
         </Section>
 
-        {/* Reflection Summary */}
         <Section title="Reflection Summary">
           <div className="space-y-4">
             <div>

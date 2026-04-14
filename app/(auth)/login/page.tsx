@@ -1,8 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { signInWithEmailAndPassword } from 'firebase/auth'
+import { getClientAuth } from '@/lib/firebase/client'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -15,15 +16,24 @@ export default function LoginPage() {
     e.preventDefault()
     setError('')
     setLoading(true)
-    // Create client here so it's never called during server-side prerender
-    const supabase = createClient()
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) {
-      setError(error.message)
-      setLoading(false)
-    } else {
+    try {
+      const { user } = await signInWithEmailAndPassword(getClientAuth(), email, password)
+      const idToken = await user.getIdToken()
+
+      const res = await fetch('/api/auth/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken }),
+      })
+
+      if (!res.ok) throw new Error('Failed to create session')
+
       router.push('/dashboard')
       router.refresh()
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Sign-in failed'
+      setError(msg.includes('invalid-credential') ? 'Incorrect email or password' : msg)
+      setLoading(false)
     }
   }
 

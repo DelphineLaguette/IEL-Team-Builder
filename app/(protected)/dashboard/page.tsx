@@ -1,4 +1,5 @@
-import { createClient } from '@/lib/supabase/server'
+import { getAdminDb } from '@/lib/firebase/admin'
+import { getServerSession } from '@/lib/firebase/session'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import LogoutButton from './logout-button'
@@ -15,7 +16,7 @@ const PRINCIPLES = [
 ]
 
 type Reflection = {
-  id: string
+  uid: string
   leader_name: string
   team: string
   email: string
@@ -27,13 +28,12 @@ type Reflection = {
   p6_rating: number
   strongest_principle: string
   main_development_area: string
-  created_at: string
+  updated_at: string
 }
 
 function RatingBar({ value }: { value: number }) {
   const pct = ((value || 0) / 5) * 100
-  const color =
-    value >= 4 ? 'bg-teal' : value >= 3 ? 'bg-pink' : 'bg-gray-300'
+  const color = value >= 4 ? 'bg-teal' : value >= 3 ? 'bg-pink' : 'bg-gray-300'
   return (
     <div className="flex items-center gap-2">
       <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
@@ -51,18 +51,16 @@ function avgScore(r: Reflection) {
 }
 
 export default async function DashboardPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const session = await getServerSession()
+  if (!session) redirect('/login')
 
-  const { data: reflections, error } = await supabase
-    .from('reflections')
-    .select('id, leader_name, team, email, p1_rating, p2_rating, p3_rating, p4_rating, p5_rating, p6_rating, strongest_principle, main_development_area, created_at')
-    .order('created_at', { ascending: false })
+  const snapshot = await getAdminDb()
+    .collection('reflections')
+    .orderBy('updated_at', 'desc')
+    .get()
 
-  const rows = (reflections ?? []) as Reflection[]
+  const rows = snapshot.docs.map(d => d.data() as Reflection)
 
-  // Aggregate averages per principle
   const principleAvgs = PRINCIPLES.map(p => {
     const vals = rows.map(r => r[`${p.key}_rating` as keyof Reflection] as number).filter(Boolean)
     const avg = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 0
@@ -91,7 +89,7 @@ export default async function DashboardPage() {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 py-10 space-y-10">
-        {/* Summary stats */}
+        {/* Principle averages */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           {principleAvgs.map(p => (
             <div key={p.key} className="bg-white rounded-2xl p-4 border border-gray-200 text-center">
@@ -104,13 +102,7 @@ export default async function DashboardPage() {
           ))}
         </div>
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-600 text-sm">
-            Error loading reflections: {error.message}
-          </div>
-        )}
-
-        {rows.length === 0 && !error && (
+        {rows.length === 0 && (
           <div className="text-center py-16 text-gray-400">
             <p className="text-lg font-medium">No reflections submitted yet.</p>
             <p className="text-sm mt-1">Leaders will appear here once they complete the form.</p>
@@ -120,9 +112,9 @@ export default async function DashboardPage() {
           </div>
         )}
 
-        {/* Leader cards grid */}
         {rows.length > 0 && (
           <>
+            {/* Leader cards */}
             <div>
               <h2 className="text-lg font-bold text-navy mb-4">
                 Leader Submissions <span className="text-gray-400 font-normal text-base">({rows.length})</span>
@@ -130,8 +122,8 @@ export default async function DashboardPage() {
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {rows.map(r => (
                   <Link
-                    key={r.id}
-                    href={`/dashboard/${r.id}`}
+                    key={r.uid}
+                    href={`/dashboard/${r.uid}`}
                     className="bg-white rounded-2xl p-5 border border-gray-200 hover:border-teal hover:shadow-sm transition group"
                   >
                     <div className="flex items-start justify-between mb-4">
@@ -180,9 +172,9 @@ export default async function DashboardPage() {
                   </thead>
                   <tbody>
                     {rows.map((r, i) => (
-                      <tr key={r.id} className={`border-b border-gray-50 hover:bg-gray-50 transition ${i % 2 === 0 ? '' : 'bg-gray-50/50'}`}>
+                      <tr key={r.uid} className={`border-b border-gray-50 hover:bg-gray-50 transition ${i % 2 === 0 ? '' : 'bg-gray-50/50'}`}>
                         <td className="px-5 py-3">
-                          <Link href={`/dashboard/${r.id}`} className="font-medium text-navy hover:text-teal transition">
+                          <Link href={`/dashboard/${r.uid}`} className="font-medium text-navy hover:text-teal transition">
                             {r.leader_name}
                           </Link>
                           <p className="text-xs text-gray-400">{r.team}</p>

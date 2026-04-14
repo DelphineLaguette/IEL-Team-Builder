@@ -1,11 +1,8 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { getServerSession } from '@/lib/firebase/session'
 
 export default async function ProtectedLayout({ children }: { children: React.ReactNode }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user) redirect('/login')
-
+  const session = await getServerSession()
+  if (!session) redirect('/login')
   return <>{children}</>
 }

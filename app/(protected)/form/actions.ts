@@ -1,6 +1,7 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { getAdminDb } from '@/lib/firebase/admin'
+import { getServerSession } from '@/lib/firebase/session'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
@@ -38,15 +39,13 @@ export type ReflectionData = {
 }
 
 export async function saveReflection(data: ReflectionData) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const session = await getServerSession()
+  if (!session) redirect('/login')
 
-  const { error } = await supabase
-    .from('reflections')
-    .upsert({ user_id: user.id, ...data }, { onConflict: 'user_id' })
-
-  if (error) throw new Error(error.message)
+  await getAdminDb()
+    .collection('reflections')
+    .doc(session.uid)
+    .set({ ...data, uid: session.uid, updated_at: new Date().toISOString() }, { merge: true })
 
   revalidatePath('/dashboard')
   redirect('/dashboard')
