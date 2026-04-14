@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Leadership Tracker',
+  title: 'IEL Pioneer Tracker',
   description: 'Track leadership development and coaching across your team',
 }
 

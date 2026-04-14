@@ -45,7 +45,7 @@ export default function LoginPage() {
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-navy mb-4">
             <span className="text-2xl font-bold text-teal">L</span>
           </div>
-          <h1 className="text-2xl font-bold text-navy">Leadership Tracker</h1>
+          <h1 className="text-2xl font-bold text-navy">IEL Pioneer Tracker</h1>
           <p className="text-gray-600 mt-1 text-sm">Sign in to access your reflection</p>
         </div>
 

@@ -73,7 +73,7 @@ export default async function DashboardPage() {
       <header className="bg-navy text-white py-4 px-6">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div>
-            <p className="text-teal text-xs font-medium tracking-widest uppercase">Leadership Tracker</p>
+            <p className="text-teal text-xs font-medium tracking-widest uppercase">IEL Pioneer Tracker</p>
             <h1 className="font-bold text-xl">Team Dashboard</h1>
           </div>
           <div className="flex items-center gap-4">

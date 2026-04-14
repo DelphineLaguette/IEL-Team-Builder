@@ -85,7 +85,7 @@ export default async function LeaderDetailPage({ params }: { params: Promise<{ i
       <header className="bg-navy text-white py-4 px-6">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <div>
-            <p className="text-teal text-xs font-medium tracking-widest uppercase">Leadership Tracker</p>
+            <p className="text-teal text-xs font-medium tracking-widest uppercase">IEL Pioneer Tracker</p>
             <h1 className="font-bold text-xl">{r.leader_name}</h1>
             <p className="text-gray-400 text-sm">{r.team}</p>
           </div>
